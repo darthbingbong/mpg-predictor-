@@ -1,0 +1,71 @@
+Fuel Economy Predictor
+========================================================
+author: Your Name
+date: October 2026
+autosize: true
+transition: rotate
+font-family: 'Helvetica'
+
+A Shiny app that predicts a car's MPG from weight, horsepower and transmission
+
+**App:** https://YOUR-ACCOUNT.shinyapps.io/mpg-predictor/
+
+The Problem
+========================================================
+
+- Fuel cost is one of the biggest running costs of owning a car
+- Buyers often know a car's **weight**, **horsepower** and **transmission**, but not its real-world MPG
+- We want a quick, simple estimate that needs **no statistics knowledge**
+
+The **Fuel Economy Predictor** turns three easy inputs into an MPG estimate with an uncertainty range.
+
+The Model (evaluated live)
+========================================================
+
+Linear regression on R's built-in `mtcars` data:
+
+```{r}
+fit <- lm(mpg ~ wt + hp + am, data = mtcars)
+round(coef(fit), 3)
+round(summary(fit)$r.squared, 3)
+```
+
+The three inputs explain about `r round(100 * summary(fit)$r.squared)`% of the variation in MPG.
+
+Example Prediction
+========================================================
+left: 55%
+
+```{r, echo=FALSE, fig.width=6, fig.height=4.5}
+fit <- lm(mpg ~ wt + hp + am, data = mtcars)
+plot(mtcars$wt, mtcars$mpg, pch = 19, col = "grey40",
+     xlab = "Weight (1000 lbs)", ylab = "MPG")
+g <- seq(1.5, 5.5, 0.05)
+lines(g, predict(fit, data.frame(wt = g, hp = 140, am = 0)), col = "steelblue", lwd = 2)
+lines(g, predict(fit, data.frame(wt = g, hp = 140, am = 1)), col = "darkorange", lwd = 2, lty = 2)
+p <- predict(fit, data.frame(wt = 3.2, hp = 140, am = 0))
+points(3.2, p, pch = 19, col = "red", cex = 2)
+```
+
+***
+
+A 3,200 lb automatic car with 140 hp:
+
+```{r, echo=FALSE}
+car <- data.frame(wt = 3.2, hp = 140, am = 0)
+round(predict(fit, car, interval = "prediction"), 1)
+```
+
+The app shows this instantly and redraws as you move the sliders.
+
+Why Use It?
+========================================================
+
+- **Simple:** two sliders, one radio button, one checkbox
+- **Instant:** predictions update reactively on every change
+- **Honest:** shows a 95% prediction interval, not just a single number
+- **Documented:** a built-in *How to use* tab explains every control
+
+Try it: **https://YOUR-ACCOUNT.shinyapps.io/mpg-predictor/**
+
+Code: **https://github.com/YOUR-USERNAME/mpg-predictor**
